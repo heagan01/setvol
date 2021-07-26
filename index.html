@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <script src='reconnectingwebsocket.js'></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400&display=swap" rel="stylesheet"> 
+
+    <meta charset="UTF-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>WebSocket Client</title>
+
+</head>
+
+<body>
+    <div id="box" onclick='getVolume()'><p id="title">Current Volume</p><div id="value">Click Me!</div></div>
+    <div id="box"><input id="volume" placeholder='Input volume value'></input> <button onclick='old()'>Change!</button></div>
+</body>
+
+<style type="text/css">
+    #box {
+        height: 300px;
+        width: 300px;
+        border-radius: 10px;
+        box-shadow: -3px 1px 25px -3px rgba(0,0,0,0.75);
+        -webkit-box-shadow: -3px 1px 25px -3px rgba(0,0,0,0.75);
+        -moz-box-shadow: -3px 1px 25px -3px rgba(0,0,0,0.75);
+        border: 1px #000 solid;
+    }
+
+    #value {
+        color: #000;
+        text-align: center;
+        line-height: 200px;
+        font-size: 50px;
+        font-weight: 300;
+        border-radius: 50%;
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #title {
+        color: #bdbcbb;
+        font-weight: 200;
+        font-family: 'Rubik', sans-serif;
+        text-align: center;
+    }
+</style>
+
+<script>
+    const socket = new ReconnectingWebSocket('ws://192.168.18.15:8000');
+    let vol = 0
+
+function isNumeric(num){
+  return !isNaN(num)
+}
+
+socket.onopen = () => {
+    console.info('Connected!')
+};
+
+socket.onmessage = event => {
+    if (isNumeric(event.data)) {
+        vol = event.data
+        document.getElementById('value').innerHTML = vol
+    }
+
+    console.log(event.data)
+};
+
+function checkServer(ip) {
+    const test = new ReconnectingWebSocket('ws://' + ip + ":8080")
+    test.send('check')
+}
+
+function getVolume() {
+    socket.send('getvolume')
+}
+
+function old() {
+    value = document.getElementById('volume').value
+    mystring = 'setvolume ' + value
+    document.getElementById('value').innerHTML = value
+    socket.send(mystring)
+}
+
+</script>
