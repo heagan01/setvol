@@ -3,12 +3,17 @@
 <html lang="en">
 
 <head>
-
     <script src='reconnectingwebsocket.js'></script>
 
+    <link rel="stylesheet" href="odometer-theme-default.css">
+    <script src="odometer.min.js"></script>
+    
+
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
 
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400&display=swap" rel="stylesheet"> 
 
@@ -23,7 +28,7 @@
 </head>
 
 <body>
-    <div id="box" onclick='getVolume()'><p id="title">Current Volume</p><div id="value">Click Me!</div></div>
+    <div id="box" onclick='getVolume()'><p id='title'>Current Volume</p><p id='value' class='odometer'>0</p></div>
     <div id="box"><input id="volume" placeholder='Input volume value'></input> <button onclick='old()'>Change!</button></div>
 </body>
 
@@ -40,8 +45,8 @@
 
     #value {
         color: #000;
-        text-align: center;
-        line-height: 200px;
+        text-align: center !important;
+        line-height: 125px;
         font-size: 50px;
         font-weight: 300;
         border-radius: 50%;
@@ -57,7 +62,7 @@
 </style>
 
 <script>
-    const socket = new ReconnectingWebSocket('ws://192.168.18.15:8000');
+    const socket = new ReconnectingWebSocket('ws://localhost:8008');
     let vol = 0
 
 function isNumeric(num){
@@ -84,6 +89,8 @@ function checkServer(ip) {
 
 function getVolume() {
     socket.send('getvolume')
+    document.getElementById('value').innerHTML = event.data
+    console.log(event.data)
 }
 
 function old() {

@@ -1,7 +1,11 @@
 import asyncio
 import subprocess
 import websockets
+from pynput.keyboard import Key,Controller
 import math
+import time
+
+keyboard = Controller()
 
 # create handler for each connection
 
@@ -14,11 +18,17 @@ async def handler(websocket, path):
         output = str(volume).replace('b', '')
         output = output.replace("'", '', 2)
         await websocket.send(output)
-        print(type(output))
     elif "setvolume" in data:
-        mystring = data.split()
-        print(mystring[1])
-        subprocess.run(['SetVol.exe', mystring[1]])
+        volume = data.split(' ')
+        asdf = subprocess.check_output('getvol.bat', shell=True).strip()
+        output = str(asdf).replace('b', '')
+        output = output.replace("'", '', 2)
+        realvolume = int(int(volume[1]) / 2)
+        print(realvolume)
+        for item in range(realvolume):
+            keyboard.press(Key.media_volume_down)
+            keyboard.release(Key.media_volume_down)
+            time.sleep(0.1)
     elif "check":
         await websocket.send('checked')
 
@@ -27,7 +37,7 @@ async def handler(websocket, path):
 
  
 
-start_server = websockets.serve(handler, "192.168.18.15", 8000)
+start_server = websockets.serve(handler, "localhost", 8008)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 print('Runned')
